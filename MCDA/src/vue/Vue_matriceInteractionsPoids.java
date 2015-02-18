@@ -55,12 +55,12 @@ public class Vue_matriceInteractionsPoids {
 	private void initialize() {
 		controleur = new Controleur(this);
 		frmMatriceInteractionsPoids = new JFrame();
-		frmMatriceInteractionsPoids.setTitle("Sp\u00E9cifier la matrice des int\u00E9ractions et des poids");
+		frmMatriceInteractionsPoids.setTitle("Sp\u00E9cifier la matrice des interactions et des poids");
 		frmMatriceInteractionsPoids.setBounds(100, 100, 450, 330);
 		frmMatriceInteractionsPoids.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmMatriceInteractionsPoids.getContentPane().setLayout(null);
 		
-		btnValider = new JButton("valider la matrice des int\u00E9ractions et des poids");
+		btnValider = new JButton("valider la matrice des interactions et des poids");
 		btnValider.setBounds(10, 258, 414, 23);
 		frmMatriceInteractionsPoids.getContentPane().add(btnValider);
 		btnValider.addActionListener(controleur);
@@ -82,7 +82,7 @@ public class Vue_matriceInteractionsPoids {
 		matriceInteractionsPoids = new JTextField[nbCriteres][nbCriteres];
 		panel.setLayout(new GridLayout(nbCriteres + 1, nbCriteres + 1, 1, 1));
 		
-		lblEnonce = new JLabel("Remplissez la matrice des int\u00E9ractions et poids puis validez");
+		lblEnonce = new JLabel("Remplissez la matrice des interactions et poids puis validez");
 		lblEnonce.setHorizontalAlignment(SwingConstants.CENTER);
 		lblEnonce.setForeground(Color.BLUE);
 		lblEnonce.setFont(new Font("Trebuchet MS", Font.BOLD, 12));

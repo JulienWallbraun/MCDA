@@ -215,32 +215,17 @@ public class Global {
 	public double calculMoyenneInf(int numAlternative){
 		double moyenneInf = 0;
 		ArrayList<Point> listePointsTriee = choquetGlobalPourUneAlternative(numAlternative);
-		//on détermine l'ordonnée du point dont l'abscisse vaut E*inf
-		double ordonneePointDAbscisseEinf=0;
 		int i=0;
-		double abscissePointA = listePointsTriee.get(0).getAbscisse();
-		int j=1;
 		while (!listePointsTriee.get(i).getName().equals("b")){
 			double abscisse1 = listePointsTriee.get(i).getAbscisse();
 			double ordonnee1 = listePointsTriee.get(i).getOrdonnee();
 			double abscisse2 = listePointsTriee.get(i+1).getAbscisse();
 			double ordonnee2 = listePointsTriee.get(i+1).getOrdonnee();
-			ordonneePointDAbscisseEinf += 0.5*(abscisse2-abscisse1)*(ordonnee1+ordonnee2);
+			//cas pente infinie
+			if (abscisse1==abscisse2) moyenneInf=abscisse1;
+			//cas normal
+			else moyenneInf += 0.5*((ordonnee2-ordonnee1)/(abscisse2-abscisse1))*(abscisse2*abscisse2-abscisse1*abscisse1);
 			i++;
-		}
-		double abscissePointB = listePointsTriee.get(i).getAbscisse();
-		//cas pente infinie
-		if (abscissePointA==abscissePointB){
-			moyenneInf = abscissePointA;
-		}
-		//cas normal
-		else{
-			ordonneePointDAbscisseEinf = ordonneePointDAbscisseEinf/(abscissePointB-abscissePointA);
-			//on détermine l'abscisse du point d'ordonnée "ordonneePointDAbscisseEinf"
-			while (listePointsTriee.get(j).getOrdonnee() < ordonneePointDAbscisseEinf){
-				j++;
-			}
-			moyenneInf = trouverAbscissePointAPartirOrdonneeEt2PointsDroite(ordonneePointDAbscisseEinf, listePointsTriee.get(j-1), listePointsTriee.get(j));
 		}
 		return moyenneInf;
 	}
@@ -248,33 +233,18 @@ public class Global {
 	public double calculMoyenneSup(int numAlternative){
 		double moyenneSup = 0;
 		ArrayList<Point> listePointsTriee = choquetGlobalPourUneAlternative(numAlternative);
-		//on détermine l'ordonnée du point dont l'abscisse vaut E*sup
-		double ordonneePointDAbscisseEsup=0;
 		int i=0;
 		while (!listePointsTriee.get(i).getName().equals("c"))i++;
-		double abscissePointC = listePointsTriee.get(i).getAbscisse();
-		int j=i;
 		while (!listePointsTriee.get(i).getName().equals("d")){
 			double abscisse1 = listePointsTriee.get(i).getAbscisse();
 			double ordonnee1 = listePointsTriee.get(i).getOrdonnee();
 			double abscisse2 = listePointsTriee.get(i+1).getAbscisse();
 			double ordonnee2 = listePointsTriee.get(i+1).getOrdonnee();
-			ordonneePointDAbscisseEsup += 0.5*(abscisse2-abscisse1)*(ordonnee1+ordonnee2);
+			//cas pente infinie
+			if (abscisse1==abscisse2) moyenneSup=abscisse1;
+			//cas normal
+			else moyenneSup -= 0.5*((ordonnee2-ordonnee1)/(abscisse2-abscisse1))*(abscisse2*abscisse2-abscisse1*abscisse1);
 			i++;
-		}
-		double abscissePointD = listePointsTriee.get(i).getAbscisse();
-		//cas pente infinie
-		if (abscissePointC==abscissePointD){
-			moyenneSup = abscissePointC;
-		}
-		//cas normal
-		else{
-			ordonneePointDAbscisseEsup = ordonneePointDAbscisseEsup/(abscissePointD-abscissePointC);
-			//on détermine l'abscisse du point d'ordonnée "ordonneePointDAbscisseEsup"
-			while (listePointsTriee.get(j).getOrdonnee() > ordonneePointDAbscisseEsup){
-				j++;
-			}
-			moyenneSup = trouverAbscissePointAPartirOrdonneeEt2PointsDroite(ordonneePointDAbscisseEsup, listePointsTriee.get(j-1), listePointsTriee.get(j));
 		}
 		return moyenneSup;
 	}
@@ -288,7 +258,7 @@ public class Global {
 	}
 	
 	/*
-	 * méthodes utilitaires
+	 * méthode utilitaire
 	 */
 	public ArrayList<Point> rangerParAbscisseCroissante(ArrayList<Point> listePoints){
 		ArrayList<Point> listePointsTrieeParAbscisseCroissante = listePoints;
@@ -302,15 +272,6 @@ public class Global {
 			}
 		}
 		return listePointsTrieeParAbscisseCroissante;
-	}
-	
-	//retourne, à partir d'une ordonnée et des coordonnées de 2 points, l'abscisse du point correspondant à l'ordonnée et appartenant à la droite
-	public double trouverAbscissePointAPartirOrdonneeEt2PointsDroite(double ordonnee, Point point1, Point point2){
-		double x1 = point1.getAbscisse();
-		double x2 = point2.getAbscisse();
-		double y1 = point1.getOrdonnee();
-		double y2 = point2.getOrdonnee();
-		return x2+(ordonnee-y2)*(x2-x1)/(y2-y1);
 	}
 	
 	/*

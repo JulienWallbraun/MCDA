@@ -212,6 +212,110 @@ public class Global {
 		return rangerParAbscisseCroissante(choquetGlobalPourUneAlternative);
 	}
 	
+	public double calculMoyenneInf(int numAlternative){
+		double moyenneInf = 0;
+		ArrayList<Point> listePointsTriee = choquetGlobalPourUneAlternative(numAlternative);
+		//on détermine l'ordonnée du point dont l'abscisse vaut E*inf
+		double ordonneePointDAbscisseEinf=0;
+		int i=0;
+		double abscissePointA = listePointsTriee.get(0).getAbscisse();
+		int j=1;
+		while (!listePointsTriee.get(i).getName().equals("b")){
+			double abscisse1 = listePointsTriee.get(i).getAbscisse();
+			double ordonnee1 = listePointsTriee.get(i).getOrdonnee();
+			double abscisse2 = listePointsTriee.get(i+1).getAbscisse();
+			double ordonnee2 = listePointsTriee.get(i+1).getOrdonnee();
+			ordonneePointDAbscisseEinf += 0.5*(abscisse2-abscisse1)*(ordonnee1+ordonnee2);
+			i++;
+		}
+		double abscissePointB = listePointsTriee.get(i).getAbscisse();
+		//cas pente infinie
+		if (abscissePointA==abscissePointB){
+			moyenneInf = abscissePointA;
+		}
+		//cas normal
+		else{
+			ordonneePointDAbscisseEinf = ordonneePointDAbscisseEinf/(abscissePointB-abscissePointA);
+			//on détermine l'abscisse du point d'ordonnée "ordonneePointDAbscisseEinf"
+			while (listePointsTriee.get(j).getOrdonnee() < ordonneePointDAbscisseEinf){
+				j++;
+			}
+			moyenneInf = trouverAbscissePointAPartirOrdonneeEt2PointsDroite(ordonneePointDAbscisseEinf, listePointsTriee.get(j-1), listePointsTriee.get(j));
+		}
+		return moyenneInf;
+	}
+	
+	public double calculMoyenneSup(int numAlternative){
+		double moyenneSup = 0;
+		ArrayList<Point> listePointsTriee = choquetGlobalPourUneAlternative(numAlternative);
+		//on détermine l'ordonnée du point dont l'abscisse vaut E*sup
+		double ordonneePointDAbscisseEsup=0;
+		int i=0;
+		while (!listePointsTriee.get(i).getName().equals("c"))i++;
+		double abscissePointC = listePointsTriee.get(i).getAbscisse();
+		int j=i;
+		while (!listePointsTriee.get(i).getName().equals("d")){
+			double abscisse1 = listePointsTriee.get(i).getAbscisse();
+			double ordonnee1 = listePointsTriee.get(i).getOrdonnee();
+			double abscisse2 = listePointsTriee.get(i+1).getAbscisse();
+			double ordonnee2 = listePointsTriee.get(i+1).getOrdonnee();
+			ordonneePointDAbscisseEsup += 0.5*(abscisse2-abscisse1)*(ordonnee1+ordonnee2);
+			i++;
+		}
+		double abscissePointD = listePointsTriee.get(i).getAbscisse();
+		//cas pente infinie
+		if (abscissePointC==abscissePointD){
+			moyenneSup = abscissePointC;
+		}
+		//cas normal
+		else{
+			ordonneePointDAbscisseEsup = ordonneePointDAbscisseEsup/(abscissePointD-abscissePointC);
+			//on détermine l'abscisse du point d'ordonnée "ordonneePointDAbscisseEsup"
+			while (listePointsTriee.get(j).getOrdonnee() > ordonneePointDAbscisseEsup){
+				j++;
+			}
+			moyenneSup = trouverAbscissePointAPartirOrdonneeEt2PointsDroite(ordonneePointDAbscisseEsup, listePointsTriee.get(j-1), listePointsTriee.get(j));
+		}
+		return moyenneSup;
+	}
+	
+	public double indicateurPosition(int numAlternative){
+		return 0.5*(calculMoyenneInf(numAlternative)+calculMoyenneSup(numAlternative));
+	}
+	
+	public double indicateurImprecisionMoyenne(int numAlternative){
+		return calculMoyenneSup(numAlternative)-calculMoyenneInf(numAlternative);
+	}
+	
+	/*
+	 * méthodes utilitaires
+	 */
+	public ArrayList<Point> rangerParAbscisseCroissante(ArrayList<Point> listePoints){
+		ArrayList<Point> listePointsTrieeParAbscisseCroissante = listePoints;
+		for (int i=listePoints.size()-1; i>=0; i--){
+			for (int j=0; j<i; j++){
+				if (listePointsTrieeParAbscisseCroissante.get(j).getAbscisse() > listePointsTrieeParAbscisseCroissante.get(j+1).getAbscisse()){
+					Point pointAuxiliaire = listePointsTrieeParAbscisseCroissante.get(j);
+					listePointsTrieeParAbscisseCroissante.set(j, listePointsTrieeParAbscisseCroissante.get(j+1));
+					listePointsTrieeParAbscisseCroissante.set(j+1, pointAuxiliaire);					
+				}
+			}
+		}
+		return listePointsTrieeParAbscisseCroissante;
+	}
+	
+	//retourne, à partir d'une ordonnée et des coordonnées de 2 points, l'abscisse du point correspondant à l'ordonnée et appartenant à la droite
+	public double trouverAbscissePointAPartirOrdonneeEt2PointsDroite(double ordonnee, Point point1, Point point2){
+		double x1 = point1.getAbscisse();
+		double x2 = point2.getAbscisse();
+		double y1 = point1.getOrdonnee();
+		double y2 = point2.getOrdonnee();
+		return x2+(ordonnee-y2)*(x2-x1)/(y2-y1);
+	}
+	
+	/*
+	 * méthodes d'affichage
+	 */
 	public String afficherIndicateursPourUneAlternative(int numAlternative){
 		String affichage = "";
 		for (int j=0; j<nbCriteres; j++){
@@ -246,64 +350,11 @@ public class Global {
 		return affichage;
 	}
 	
-	public ArrayList<Point> rangerParAbscisseCroissante(ArrayList<Point> listePoints){
-		ArrayList<Point> listePointsTrieeParAbscisseCroissante = listePoints;
-		for (int i=listePoints.size()-1; i>=0; i--){
-			for (int j=0; j<i; j++){
-				if (listePointsTrieeParAbscisseCroissante.get(j).getAbscisse() > listePointsTrieeParAbscisseCroissante.get(j+1).getAbscisse()){
-					Point pointAuxiliaire = listePointsTrieeParAbscisseCroissante.get(j);
-					listePointsTrieeParAbscisseCroissante.set(j, listePointsTrieeParAbscisseCroissante.get(j+1));
-					listePointsTrieeParAbscisseCroissante.set(j+1, pointAuxiliaire);					
-				}
-			}
-		}
-		return listePointsTrieeParAbscisseCroissante;
-	}
-	
-	public double enveloppeInf(int numAlternative){
-		double res=0;
-		ArrayList<Point> listePointsTriee = choquetGlobalPourUneAlternative(numAlternative);
-		int i=0;
-		while (!listePointsTriee.get(i).getName().equals("b")){
-			double abscisse1 = listePointsTriee.get(i).getAbscisse();
-			double ordonnee1 = listePointsTriee.get(i).getOrdonnee();
-			double abscisse2 = listePointsTriee.get(i+1).getAbscisse();
-			double ordonnee2 = listePointsTriee.get(i+1).getOrdonnee();
-			res += 0.5*(abscisse2-abscisse1)*(ordonnee1+ordonnee2);
-			i++;
-		}
-		return res;
-	}
-	
-	public double enveloppeSup(int numAlternative){
-		double res=0;
-		ArrayList<Point> listePointsTriee = choquetGlobalPourUneAlternative(numAlternative);
-		int i=0;
-		while (!listePointsTriee.get(i).getName().equals("c"))i++;
-		while (!listePointsTriee.get(i).getName().equals("d")){
-			double abscisse1 = listePointsTriee.get(i).getAbscisse();
-			double ordonnee1 = listePointsTriee.get(i).getOrdonnee();
-			double abscisse2 = listePointsTriee.get(i+1).getAbscisse();
-			double ordonnee2 = listePointsTriee.get(i+1).getOrdonnee();
-			res += 0.5*(abscisse2-abscisse1)*(ordonnee1+ordonnee2);
-			i++;
-		}
-		return res;
-	}
-	
-	public double indicateurPosition(int numAlternative){
-		return 0.5*(enveloppeInf(numAlternative)+enveloppeSup(numAlternative));
-	}
-	
-	public double indicateurImprecisionMoyenne(int numAlternative){
-		return enveloppeSup(numAlternative)-enveloppeInf(numAlternative);
-	}
-	
-	public String afficherEnveloppesInfEtSup(int numAlternative){
+	public String afficherMoyennesInfEtSup(int numAlternative){
 		String affichage = "";
-		affichage += "calcul des enveloppes inférieure et supérieure de l'alternative "+numAlternative+" :\n";
-		affichage += "E*inf : "+enveloppeInf(numAlternative)+"\n";
-		affichage += "E*sup : "+enveloppeSup(numAlternative)+"\n";
+		affichage += "calcul des moyennes inférieure et supérieure de l'alternative "+numAlternative+" :\n";
+		affichage += "E*inf : "+calculMoyenneInf(numAlternative)+"\n";
+		affichage += "E*sup : "+calculMoyenneSup(numAlternative)+"\n";
 		return affichage;
 	}
 	
@@ -319,7 +370,7 @@ public class Global {
 		String affichage = "";
 		affichage += afficherIndicateursPourUneAlternative(numAlternative)+"\n";
 		affichage += afficherPointsChoquetAdditifPourUneAlternative(numAlternative)+"\n";
-		affichage += afficherEnveloppesInfEtSup(numAlternative)+"\n";
+		affichage += afficherMoyennesInfEtSup(numAlternative)+"\n";
 		affichage += afficherIndicateursPositionEtImprecisionMoyenne(numAlternative)+"\n";
 		return affichage;
 	}
